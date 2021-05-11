@@ -18,7 +18,9 @@ samples, guidance on mobile development, and a full API reference.
 password jks 12345678
 keyalias jks petty_cash
 
+// Tidak dipakai
 flutter build appbundle --dart-define=DISPLAY_NAME=Buku%*Kas%*Saya --dart-define=MAIN_URL=http://47.74.214.215:82/pettycashmassalv2/ --dart-define=APP_ID=com.mge.pettycash --release
+// Sampai disini tidak dipakai
 
 flutter build apk --dart-define='DISPLAY_NAME=Buku Kas Saya' --dart-define=MAIN_URL=http://47.74.214.215:82/pettycashmassalv2/ --dart-define=APP_ID=com.mge.pettycash --release
 
