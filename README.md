@@ -22,5 +22,4 @@ flutter build appbundle --dart-define=DISPLAY_NAME=Buku%*Kas%*Saya --dart-define
 
 flutter build apk --dart-define='DISPLAY_NAME=Buku Kas Saya' --dart-define=MAIN_URL=http://47.74.214.215:82/pettycashmassalv2/ --dart-define=APP_ID=com.mge.pettycash --release
 
-// pakai yang paling bawah
 flutter build apk --dart-define='DISPLAY_NAME=Buku Kas Saya' --dart-define=MAIN_URL=http://mgbix.id:82/kas/ --dart-define=APP_ID=com.mge.pettycash --release
