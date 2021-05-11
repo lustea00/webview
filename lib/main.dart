@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: EnvironmentConfig.DISPLAY_NAME,
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -123,6 +123,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class EnvironmentConfig {
   static const MAIN_URL = String.fromEnvironment('MAIN_URL', defaultValue: 'http://47.74.214.215:82/pettycashmassalv2');
-  static const APP_NAME = String.fromEnvironment('APP_NAME', defaultValue: 'Web View');
-  static const APP_ID = String.fromEnvironment('APP_ID', defaultValue: 'com.example.webview');
+  static const DISPLAY_NAME = String.fromEnvironment('DISPLAY_NAME', defaultValue: 'Buku Kas Saya');
+  static const APP_ID = String.fromEnvironment('APP_ID', defaultValue: 'com.mge.pettycash');
 }

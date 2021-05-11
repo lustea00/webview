@@ -2,8 +2,11 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -30,6 +33,22 @@ class _MainScreenState extends State<MainScreen> {
     if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
   }
 
+  sendWhatsApp(String url) {
+    try {
+      String phone = url.split("=")[1];
+      FlutterOpenWhatsapp.sendSingleMessage(phone, "");
+    } catch (_) {
+      Fluttertoast.showToast(
+          msg: _.toString(),
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
+
   Future loginWithGoogle() async {
     FirebaseApp defaultApp = await Firebase.initializeApp();
     _auth = FirebaseAuth.instanceFor(app: defaultApp);
@@ -37,24 +56,35 @@ class _MainScreenState extends State<MainScreen> {
     try {
       await _googleSignIn.disconnect();
     } catch (_) {}
-    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-    if (googleUser != null) {
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
-      _user = (await _auth.signInWithCredential(credential)).user;
-      // await firebaseUser.reload();
-      Logger().e(_user);
-      String url =
-          EnvironmentConfig.MAIN_URL + "/user/GoogleLogin?Email=" +
-              _user.email.toString() +
-              "&Name=" +
-              _user.displayName.toString() +
-              "&UID=" +
-              _user.uid.toString();
-      Logger().e(url);
-      _controller.loadUrl(url);
+    try {
+      final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+      if (googleUser != null) {
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
+        final AuthCredential credential = GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+        _user = (await _auth.signInWithCredential(credential)).user;
+        // await firebaseUser.reload();
+        Logger().e(_user);
+        String url = EnvironmentConfig.MAIN_URL +
+            "/user/GoogleLogin?Email=" +
+            _user.email.toString() +
+            "&Name=" +
+            _user.displayName.toString() +
+            "&UID=" +
+            _user.uid.toString();
+        Logger().e(url);
+        _controller.loadUrl(url);
+      }
+    } catch (_) {
+      Fluttertoast.showToast(
+          msg: _.toString(),
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 
@@ -64,7 +94,10 @@ class _MainScreenState extends State<MainScreen> {
       onWillPop: () async {
         if (await _controller.canGoBack()) {
           String curUrl = await _controller.currentUrl();
-          if (curUrl.endsWith("HomeKas") || curUrl.endsWith("ListLaporan") || curUrl.endsWith("prfl") || curUrl.endsWith("user/login")) {
+          if (curUrl.endsWith("HomeKas") ||
+              curUrl.endsWith("ListLaporan") ||
+              curUrl.endsWith("prfl") ||
+              curUrl.endsWith("user/login")) {
             return Future.value(true);
           } else {
             _controller.goBack();
@@ -90,7 +123,10 @@ class _MainScreenState extends State<MainScreen> {
                 loginWithGoogle();
                 return NavigationDecision.prevent;
               }
-              print('allowing navigation to $request');
+              if (request.url.startsWith("https://api.whatsapp.com/send/")) {
+                sendWhatsApp(request.url);
+                return NavigationDecision.prevent;
+              }
               return NavigationDecision.navigate;
             },
           ),

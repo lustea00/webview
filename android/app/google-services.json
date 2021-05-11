@@ -78,6 +78,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:472930135630:android:ba8e56e9f4f71698dc1d1f",
+        "android_client_info": {
+          "package_name": "com.mge.pettycash"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "472930135630-g8ehv0993fpo463v7reeblss6q9hj1j6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVbsadJ9PXoUYq5iuH8eUNRjW_yZztn4k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "472930135630-g8ehv0993fpo463v7reeblss6q9hj1j6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"
