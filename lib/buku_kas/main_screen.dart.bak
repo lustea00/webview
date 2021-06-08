@@ -5,11 +5,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
-// import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../main.dart';
@@ -22,7 +21,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   // InAppWebViewController webView;
-  InAppWebViewController _controller;
+  WebViewController _controller;
   GoogleSignIn _googleSignIn = GoogleSignIn();
   FirebaseAuth _auth;
   User _user;
@@ -31,7 +30,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
+    if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
   }
 
   sendWhatsApp(String url) {
@@ -75,7 +74,7 @@ class _MainScreenState extends State<MainScreen> {
             "&UID=" +
             _user.uid.toString();
         Logger().e(url);
-        _controller.loadUrl(url: url);
+        _controller.loadUrl(url);
       }
     } catch (_) {
       Fluttertoast.showToast(
@@ -94,7 +93,7 @@ class _MainScreenState extends State<MainScreen> {
     return WillPopScope(
       onWillPop: () async {
         if (await _controller.canGoBack()) {
-          String curUrl = await _controller.getUrl();
+          String curUrl = await _controller.currentUrl();
           if (curUrl.endsWith("HomeKas") ||
               curUrl.endsWith("ListLaporan") ||
               curUrl.endsWith("prfl") ||
@@ -109,42 +108,27 @@ class _MainScreenState extends State<MainScreen> {
       },
       child: SafeArea(
         child: Scaffold(
-          body: InAppWebView(
+          body: WebView(
+            debuggingEnabled: true,
+            userAgent: "tes",
+            javascriptMode: JavascriptMode.unrestricted,
             initialUrl: EnvironmentConfig.MAIN_URL,
             // initialUrl: 'http://mgbix.id:82/kas',
             // initialUrl: "https://accounts.google.com/o/oauth2/auth?redirect_uri=storagerelay%3A%2F%2Fhttp%2Fmgbix.id%3A82%3Fid%3Dauth592590&response_type=permission%20id_token&scope=email%20profile%20openid&openid.realm=&client_id=946006633307-s6nsfgokc8tn28pti2lmldtk7iiduo1b.apps.googleusercontent.com&ss_domain=http%3A%2F%2Fmgbix.id%3A82&fetch_basic_profile=true&gsiwebsdk=2",
-            // initialOptions: InAppWebViewGroupOptions(
-            //   crossPlatform: InAppWebViewOptions(
-            //     debuggingEnabled: true,
-            //   )
-            // ),
-            // debuggingEnabled: true,
-            // userAgent: "tes",
-            // javascriptMode: JavascriptMode.unrestricted,
-            onWebViewCreated: (InAppWebViewController webViewController) {
+            onWebViewCreated: (WebViewController webViewController) {
               _controller = webViewController;
             },
-            onLoadStart: (InAppWebViewController controller, String url) {
-              if (url.startsWith('https://accounts.google.com/')) {
+            navigationDelegate: (NavigationRequest request) {
+              if (request.url.startsWith('https://accounts.google.com/')) {
                 loginWithGoogle();
-                controller.stopLoading();
+                return NavigationDecision.prevent;
               }
-              if (url.startsWith("https://api.whatsapp.com/send/")) {
-                sendWhatsApp(url);
-                controller.stopLoading();
+              if (request.url.startsWith("https://api.whatsapp.com/send/")) {
+                sendWhatsApp(request.url);
+                return NavigationDecision.prevent;
               }
+              return NavigationDecision.navigate;
             },
-            // navigationDelegate: (NavigationRequest request) {
-            //   if (request.url.startsWith('https://accounts.google.com/')) {
-            //     loginWithGoogle();
-            //     return NavigationDecision.prevent;
-            //   }
-            //   if (request.url.startsWith("https://api.whatsapp.com/send/")) {
-            //     sendWhatsApp(request.url);
-            //     return NavigationDecision.prevent;
-            //   }
-            //   return NavigationDecision.navigate;
-            // },
           ),
         ),
       ),
